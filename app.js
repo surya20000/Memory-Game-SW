@@ -1,72 +1,75 @@
 document.addEventListener("DOMContentLoaded", () => {
-  //list all card options
   const cardArray = [
-    {
-      name: "fries",
-      img: "images/fries.png",
-    },
-    {
-      name: "cheeseburger",
-      img: "images/cheeseburger.png",
-    },
-    {
-      name: "ice-cream",
-      img: "images/ice-cream.png",
-    },
-    {
-      name: "pizza",
-      img: "images/pizza.png",
-    },
-    {
-      name: "milkshake",
-      img: "images/milkshake.png",
-    },
-    {
-      name: "hotdog",
-      img: "images/hotdog.png",
-    },
-    {
-      name: "fries",
-      img: "images/fries.png",
-    },
-    {
-      name: "cheeseburger",
-      img: "images/cheeseburger.png",
-    },
-    {
-      name: "ice-cream",
-      img: "images/ice-cream.png",
-    },
-    {
-      name: "pizza",
-      img: "images/pizza.png",
-    },
-    {
-      name: "milkshake",
-      img: "images/milkshake.png",
-    },
-    {
-      name: "hotdog",
-      img: "images/hotdog.png",
-    },
+    { name: "fries", img: "images/fries.png" },
+    { name: "cheeseburger", img: "images/cheeseburger.png" },
+    { name: "ice-cream", img: "images/ice-cream.png" },
+    { name: "pizza", img: "images/pizza.png" },
+    { name: "milkshake", img: "images/milkshake.png" },
+    { name: "hotdog", img: "images/hotdog.png" },
+    { name: "fries", img: "images/fries.png" },
+    { name: "cheeseburger", img: "images/cheeseburger.png" },
+    { name: "ice-cream", img: "images/ice-cream.png" },
+    { name: "pizza", img: "images/pizza.png" },
+    { name: "milkshake", img: "images/milkshake.png" },
+    { name: "hotdog", img: "images/hotdog.png" },
   ];
-
-  cardArray.sort(() => 0.5 - Math.random());
 
   const grid = document.querySelector(".grid");
   const resultDisplay = document.querySelector("#result");
+  const timerDisplay = document.querySelector("#timer");
+  const difficultySelector = document.querySelector("#difficulty");
+  const startButton = document.querySelector("#start");
   let cardsChosen = [];
   let cardsChosenId = [];
   let cardsWon = [];
+  let timeLimit = 60; 
+  let timer = null;
 
   function createBoard() {
-    for (let i = 0; i < cardArray.length; i++) {
-      const card = document.createElement("img");
-      card.setAttribute("src", "images/blank.png");
-      card.setAttribute("data-id", i);
-      card.addEventListener("click", flipCard);
-      grid.appendChild(card);
+    grid.innerHTML = ""; 
+    cardArray.sort(() => 0.5 - Math.random()); 
+    cardArray.forEach((card, index) => {
+      const cardElement = document.createElement("img");
+      cardElement.setAttribute("src", "images/blank.png");
+      cardElement.setAttribute("data-id", index);
+      cardElement.addEventListener("click", flipCard);
+      grid.appendChild(cardElement);
+    });
+  }
+
+  function startGame() {
+    const difficulty = difficultySelector.value;
+    if (difficulty === "easy") {
+      timeLimit = 75;
+    } else if (difficulty === "medium") {
+      timeLimit = 70; 
+    } else {
+      timeLimit = 60; 
     }
+
+    createBoard();
+    startTimer(); 
+    cardsWon = []; 
+    resultDisplay.textContent = 0; 
+    cardsChosen = [];
+    cardsChosenId = [];
+  }
+
+  function startTimer() {
+    let elapsedTime = 0;
+    timerDisplay.textContent = `Time Left: ${timeLimit}s`;
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => {
+      elapsedTime++;
+      const timeLeft = timeLimit - elapsedTime;
+      timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        alert("Time's up! Game over!");
+        grid.innerHTML = ""; 
+      }
+    }, 1000);
   }
 
   function checkForMatch() {
@@ -94,6 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cardsChosenId = [];
     resultDisplay.textContent = cardsWon.length;
     if (cardsWon.length === cardArray.length / 2) {
+      clearInterval(timer); 
       resultDisplay.textContent = "Congratulations! You found them all!";
     }
   }
@@ -108,5 +112,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  createBoard();
+  startButton.addEventListener("click", startGame); 
 });
